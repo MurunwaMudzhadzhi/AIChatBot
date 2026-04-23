@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- 
+    TechMate AI - Study Chatbot
+    Group Project - IT Students
+    Members: Lehlogonolo (Network Management), [Name] (Software Dev), 
+             [Name] (Cybersecurity), [Name] (Cloud Computing)
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherCore NextGen Chatbot</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ============================================
+         SPLASH SCREEN (shown first so user picks stream)
+         ============================================ -->
+    <div id="splash">
+
+        <h1 class="splash-title">CipherCore NextGen <span>Group</span></h1>
+        <p class="splash-subtitle">Tech Assist</p>
+        <p class="splash-instruction">Pick your stream to get started</p>
+
+        <!-- The 4 stream cards -->
+        <div class="stream-cards">
+
+            <div class="stream-card" onclick="selectStream('network')">
+                <div class="card-icon">🌐</div>
+                <div class="card-name">Network Management</div>
+                <div class="card-desc">IP, routing, subnetting, security</div>
+            </div>
+
+            <div class="stream-card" onclick="selectStream('software')">
+                <div class="card-icon">💻</div>
+                <div class="card-name">Software Development</div>
+                <div class="card-desc">Code, algorithms, OOP, APIs</div>
+            </div>
+
+            <div class="stream-card" onclick="selectStream('security')">
+                <div class="card-icon">🔐</div>
+                <div class="card-name">Cybersecurity</div>
+                <div class="card-desc">Threats, hacking concepts, defence</div>
+            </div>
+
+            <div class="stream-card" onclick="selectStream('cloud')">
+                <div class="card-icon">☁️</div>
+                <div class="card-name">Cloud Computing</div>
+                <div class="card-desc">AWS, Azure, Docker, DevOps</div>
+            </div>
+
+        </div>
+    </div>
+    <!-- END SPLASH -->
+
+
+    <!-- ============================================
+         MAIN APP (hidden until user picks a stream)
+         ============================================ -->
+    <div id="app" class="hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside id="sidebar">
+
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                Tech<span>Mate</span>
+            </div>
+
+            <!-- Shows which stream the user chose + lets them switch -->
+            <div id="streamBadge" class="stream-badge" onclick="showSplash()">
+                <span id="streamIcon">🌐</span>
+                <span id="streamName">Network</span>
+                <span class="switch-hint">↺ switch</span>
+            </div>
+
+            <!-- Navigation buttons -->
+            <nav>
+                <p class="nav-label">Menu</p>
+
+                <button class="nav-btn active" onclick="showPanel('chatPanel', this)">
+                    💬 AI Chat
+                </button>
+
+                <button class="nav-btn" onclick="showPanel('quizPanel', this)">
+                    🧠 Quiz Me
+                </button>
+
+                <button class="nav-btn" onclick="showPanel('resourcesPanel', this)">
+                    📚 Resources
+                </button>
+
+                <button class="nav-btn" onclick="showPanel('roadmapPanel', this)">
+                    🗺️ Roadmap
+                </button>
+            </nav>
+
+            <!-- XP Progress bar at the bottom of sidebar -->
+            <div class="xp-section">
+                <div class="xp-label">
+                    <span>XP Progress</span>
+                    <span id="xpText">0 / 100</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" id="xpBar"></div>
+                </div>
+            </div>
+
+        </aside>
+        <!-- END SIDEBAR -->
+
+
+        <!-- RIGHT SIDE - all panels live here -->
+        <main id="mainContent">
+
+
+            <!-- ========== CHAT PANEL ========== -->
+            <div class="panel active" id="chatPanel">
+
+                <!-- Top bar -->
+                <div class="topbar">
+                    <h2>💬 AI Study Assistant</h2>
+                    <button class="small-btn" onclick="clearChat()">🗑 Clear Chat</button>
+                </div>
+
+                <!-- Where messages appear -->
+                <div id="messageArea"></div>
+
+                <!-- Quick question chips -->
+                <div id="chipsArea" class="chips-area"></div>
+
+                <!-- Input area -->
+                <div class="input-area">
+                    <textarea
+                        id="chatInput"
+                        placeholder="Ask me anything about your stream..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" onclick="sendMessage()">➤</button>
+                </div>
+
+            </div>
+            <!-- END CHAT PANEL -->
+
+
+            <!-- ========== QUIZ PANEL ========== -->
+            <div class="panel hidden" id="quizPanel">
+
+                <!-- Top bar -->
+                <div class="topbar">
+                    <h2>🧠 Quiz Me</h2>
+                    <div class="small-btn">🏆 Score: <span id="totalScore">0</span></div>
+                </div>
+
+                <!-- Quiz content goes here (built by JavaScript) -->
+                <div id="quizContent" class="panel-body"></div>
+
+            </div>
+            <!-- END QUIZ PANEL -->
+
+
+            <!-- ========== RESOURCES PANEL ========== -->
+            <div class="panel hidden" id="resourcesPanel">
+
+                <div class="topbar">
+                    <h2>📚 Study Resources</h2>
+                </div>
+
+                <!-- Resources go here (built by JavaScript) -->
+                <div id="resourcesContent" class="panel-body"></div>
+
+            </div>
+            <!-- END RESOURCES PANEL -->
+
+
+            <!-- ========== ROADMAP PANEL ========== -->
+            <div class="panel hidden" id="roadmapPanel">
+
+                <div class="topbar">
+                    <h2>🗺️ Project Roadmap</h2>
+                </div>
+
+                <!-- Roadmap goes here (built by JavaScript) -->
+                <div id="roadmapContent" class="panel-body"></div>
+
+            </div>
+            <!-- END ROADMAP PANEL -->
+
+
+        </main>
+        <!-- END MAIN CONTENT -->
+
+    </div>
+    <!-- END MAIN APP -->
+
+
+    <!-- Small popup notification (for XP, correct/wrong answers) -->
+    <div id="notification" class="notification hidden"></div>
+
+
+    <!-- Link our JavaScript file - always at the bottom of body -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

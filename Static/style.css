@@ -1,0 +1,1253 @@
+/* ================================================
+   TechMate AI - Stylesheet
+   Group Project - IT Students
+   
+   TABLE OF CONTENTS:
+   1. Variables (colours, fonts)
+   2. Reset & Base styles
+   3. Splash Screen
+   4. App Shell (sidebar + main area)
+   5. Sidebar
+   6. Panels
+   7. Chat Panel
+   8. Quiz Panel
+   9. Resources Panel
+   10. Roadmap Panel
+   11. Notification popup
+   12. Utility classes
+   13. Mobile styles
+   ================================================ */
+
+
+/* ================================================
+   1. VARIABLES
+   We store colours and fonts here so we only have
+   to change them in one place.
+   ================================================ */
+:root {
+    /* Main colours */
+    --bg-dark:     #0a0a0f;
+    --bg-card:     #12121a;
+    --bg-hover:    #1a1a26;
+    --border:      rgba(255, 255, 255, 0.08);
+    --text-main:   #e8e8f0;
+    --text-muted:  #6b6b80;
+
+    /* Stream accent colours (change based on chosen stream) */
+    --accent:      #00d4ff;   /* default = network cyan */
+
+    /* Each stream has its own colour */
+    --color-network:  #00d4ff;
+    --color-software: #7c3aed;
+    --color-security: #ef4444;
+    --color-cloud:    #10b981;
+
+    /* Fonts */
+    --font-main:  'Space Mono', monospace;
+    --font-title: 'Syne', sans-serif;
+}
+
+/* Swap accent colour when stream is selected */
+body.stream-network  { --accent: var(--color-network);  }
+body.stream-software { --accent: var(--color-software); }
+body.stream-security { --accent: var(--color-security); }
+body.stream-cloud    { --accent: var(--color-cloud);    }
+
+
+/* ================================================
+   2. RESET & BASE
+   Remove default browser margins/padding
+   ================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font-main);
+}
+
+
+/* ================================================
+   3. SPLASH SCREEN
+   First thing users see - pick their stream
+   ================================================ */
+#splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    z-index: 999;
+    transition: opacity 0.4s ease;
+}
+
+#splash.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-title {
+    font-family: var(--font-title);
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* The coloured word in the title */
+.splash-title span {
+    color: #f59e0b;
+}
+
+.splash-subtitle {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.splash-instruction {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* Grid of 4 stream cards */
+.stream-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: min(480px, 90vw);
+    margin-top: 0.5rem;
+}
+
+.stream-card {
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1.4rem 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    text-align: left;
+}
+
+.stream-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+/* Hover colour per stream card */
+.stream-card:nth-child(1):hover { border-color: var(--color-network);  }
+.stream-card:nth-child(2):hover { border-color: var(--color-software); }
+.stream-card:nth-child(3):hover { border-color: var(--color-security); }
+.stream-card:nth-child(4):hover { border-color: var(--color-cloud);    }
+
+.card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.6rem;
+}
+
+.card-name {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.card-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+
+/* ================================================
+   4. APP SHELL
+   The main layout - sidebar on left, content on right
+   ================================================ */
+#app {
+    display: flex;
+    height: 100vh;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+#app.visible {
+    opacity: 1;
+}
+
+
+/* ================================================
+   5. SIDEBAR
+   Navigation on the left side
+   ================================================ */
+#sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.2rem;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+.sidebar-logo {
+    font-family: var(--font-title);
+    font-weight: 800;
+    font-size: 1.2rem;
+    padding: 0.4rem 0 0.8rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+
+/* The coloured part of the logo */
+.sidebar-logo span {
+    color: #f59e0b;
+}
+
+/* Badge that shows current stream - click to switch */
+.stream-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.stream-badge:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.switch-hint {
+    margin-left: auto;
+    opacity: 0.5;
+    font-size: 0.68rem;
+}
+
+/* Nav section label */
+.nav-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.5rem 0.2rem 0.2rem;
+}
+
+/* Nav buttons */
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+.nav-btn.active {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
+/* XP bar at the bottom of sidebar */
+.xp-section {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.xp-bar-bg {
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+
+/* ================================================
+   6. PANELS
+   The right side content areas
+   ================================================ */
+#mainContent {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Each section (chat, quiz, resources, roadmap) is a panel */
+.panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Top bar of each panel */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.topbar h2 {
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* Small button in topbar */
+.small-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.4rem 0.8rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.small-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+/* Scrollable body for quiz, resources, roadmap panels */
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.8rem;
+}
+
+.panel-body::-webkit-scrollbar {
+    width: 4px;
+}
+.panel-body::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 2px;
+}
+
+
+/* ================================================
+   7. CHAT PANEL
+   ================================================ */
+
+/* Message scroll area */
+#messageArea {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#messageArea::-webkit-scrollbar {
+    width: 4px;
+}
+#messageArea::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 2px;
+}
+
+/* Each message row */
+.message {
+    display: flex;
+    gap: 0.8rem;
+    max-width: 800px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* User messages go to the right */
+.message.user {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+}
+
+/* Avatar circle */
+.msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.message.bot .msg-avatar {
+    background-color: var(--accent);
+    color: #000;
+}
+
+.message.user .msg-avatar {
+    background-color: var(--bg-hover);
+    color: var(--text-muted);
+}
+
+/* Message bubble */
+.msg-bubble {
+    padding: 0.85rem 1.1rem;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    max-width: 580px;
+}
+
+.message.bot .msg-bubble {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+}
+
+.message.user .msg-bubble {
+    background-color: var(--accent);
+    color: #000;
+    border-top-right-radius: 4px;
+}
+
+/* Code styling inside messages */
+.msg-bubble code {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-family: var(--font-main);
+    font-size: 0.85em;
+    color: var(--accent);
+}
+
+.message.user .msg-bubble code {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: #000;
+}
+
+.msg-bubble pre {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-top: 0.6rem;
+    overflow-x: auto;
+    font-size: 0.78rem;
+}
+
+.msg-bubble pre code {
+    background: none;
+    padding: 0;
+    color: var(--accent);
+}
+
+.msg-bubble ul,
+.msg-bubble ol {
+    padding-left: 1.2rem;
+    margin-top: 0.3rem;
+}
+
+.msg-bubble strong {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.message.user .msg-bubble strong {
+    color: #000;
+}
+
+/* Typing animation (three bouncing dots) */
+.typing-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    background-color: var(--text-muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40%            { transform: translateY(-6px); }
+}
+
+/* Quick question chips */
+.chips-area {
+    padding: 0.6rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.chip {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Input bar */
+.input-area {
+    display: flex;
+    gap: 0.7rem;
+    padding: 1rem 1.5rem 1.2rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+#chatInput {
+    flex: 1;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 0.82rem;
+    resize: none;
+    min-height: 42px;
+    max-height: 140px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    line-height: 1.6;
+}
+
+#chatInput:focus {
+    border-color: var(--accent);
+}
+
+#chatInput::placeholder {
+    color: var(--text-muted);
+}
+
+#sendBtn {
+    width: 42px;
+    height: 42px;
+    background-color: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+#sendBtn:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+}
+
+#sendBtn:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+}
+
+
+/* ================================================
+   8. QUIZ PANEL
+   ================================================ */
+
+/* Start screen */
+.quiz-start {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.quiz-start h3 {
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+}
+
+.quiz-start p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+/* Topic selection grid */
+.topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.topic-btn {
+    background-color: var(--bg-hover);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-family: var(--font-main);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.topic-btn:hover,
+.topic-btn.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Difficulty selector */
+.diff-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.diff-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.diff-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: none;
+    font-family: var(--font-main);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.diff-btn:hover,
+.diff-btn.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Primary action button */
+.btn-primary {
+    background-color: var(--accent);
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 2rem;
+    font-family: var(--font-main);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #000;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+}
+
+/* Secondary button */
+.btn-secondary {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-main);
+    font-size: 0.78rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Active quiz - the question screen */
+.quiz-active {
+    max-width: 660px;
+    margin: 0 auto;
+}
+
+.quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.q-number {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.quiz-timer {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 0.8rem;
+}
+
+.quiz-timer.warning {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+/* Progress bar for quiz */
+.quiz-progress-bg {
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    margin-bottom: 1.8rem;
+    overflow: hidden;
+}
+
+.quiz-progress-fill {
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+/* The question text */
+.question-text {
+    font-family: var(--font-title);
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 1.4rem;
+}
+
+/* Answer options */
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    background-color: var(--bg-hover);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    font-family: var(--font-main);
+    font-size: 0.82rem;
+    color: var(--text-main);
+    text-align: left;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Letter badge (A, B, C, D) */
+.option-letter {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.option-btn:hover:not(:disabled) .option-letter {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Correct answer highlight */
+.option-btn.correct {
+    border-color: #10b981;
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.option-btn.correct .option-letter {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: #000;
+}
+
+/* Wrong answer highlight */
+.option-btn.wrong {
+    border-color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.option-btn.wrong .option-letter {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+}
+
+/* Explanation that shows after answering */
+.explanation-box {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    display: none;
+}
+
+.explanation-box.show {
+    display: block;
+}
+
+.explanation-box strong {
+    color: var(--accent);
+}
+
+/* Next button - shows after answering */
+.next-btn-row {
+    display: none;
+    justify-content: flex-end;
+    margin-top: 1.2rem;
+}
+
+.next-btn-row.show {
+    display: flex;
+}
+
+/* Results screen */
+.quiz-results {
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 1rem;
+}
+
+.results-grade {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.results-score {
+    font-family: var(--font-title);
+    font-size: 5rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin: 1rem 0 0.4rem;
+}
+
+.results-subtitle {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-bottom: 1.8rem;
+}
+
+.results-breakdown {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+}
+
+.breakdown-row .value {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.results-actions {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+
+/* ================================================
+   9. RESOURCES PANEL
+   ================================================ */
+.resources-title {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.resource-card {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.resource-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.resource-tag {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+}
+
+.resource-title {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 0.3rem;
+}
+
+.resource-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+
+/* ================================================
+   10. ROADMAP PANEL
+   ================================================ */
+.roadmap-intro {
+    max-width: 680px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+/* Each phase row */
+.phase-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.8rem;
+    max-width: 760px;
+}
+
+/* The dot and vertical line */
+.phase-timeline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.phase-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-title);
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: var(--accent);
+    background-color: var(--bg-dark);
+    flex-shrink: 0;
+}
+
+.phase-line {
+    flex: 1;
+    width: 2px;
+    background-color: var(--border);
+    margin: 4px 0;
+}
+
+/* Phase content card */
+.phase-card {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    flex: 1;
+}
+
+.phase-title {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.phase-duration {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+}
+
+.phase-tasks {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.phase-tasks li {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Arrow bullet */
+.phase-tasks li::before {
+    content: '▸';
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+
+/* ================================================
+   11. NOTIFICATION POPUP
+   Small message that pops up for XP, correct/wrong
+   ================================================ */
+.notification {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 0.8rem 1.1rem;
+    font-size: 0.78rem;
+    z-index: 800;
+    animation: slideIn 0.3s ease;
+    max-width: 240px;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+
+/* ================================================
+   12. UTILITY CLASSES
+   ================================================ */
+
+/* Hide an element */
+.hidden {
+    display: none !important;
+}
+
+
+/* ================================================
+   13. MOBILE STYLES
+   For screens smaller than 640px (phones)
+   ================================================ */
+@media (max-width: 640px) {
+
+    #sidebar {
+        display: none;
+    }
+
+    .stream-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .topic-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #messageArea {
+        padding: 1rem;
+    }
+
+    .input-area {
+        padding: 0.7rem 1rem 0.8rem;
+    }
+
+    .chips-area {
+        padding: 0.5rem 1rem;
+    }
+
+    /* Simple bottom nav for mobile */
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-card);
+        border-top: 1px solid var(--border);
+        z-index: 100;
+    }
+
+    .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.5rem 0 0.7rem;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-family: var(--font-main);
+        font-size: 0.58rem;
+        cursor: pointer;
+        transition: color 0.15s ease;
+    }
+
+    .mobile-nav-btn .nav-icon {
+        font-size: 1.2rem;
+    }
+
+    .mobile-nav-btn.active,
+    .mobile-nav-btn:hover {
+        color: var(--accent);
+    }
+
+    #mainContent {
+        padding-bottom: 64px;
+    }
+}
+
+/* Show mobile nav only on mobile */
+.mobile-nav {
+    display: none;
+}
